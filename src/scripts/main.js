@@ -31,13 +31,14 @@ promise1
   });
 
 const promise2 = new Promise((resolve, reject) => {
-  body.addEventListener('click', () => {
+  const handler = () => {
     resolve();
-  });
+    body.removeEventListener('click', handler);
+    body.removeEventListener('contextmenu', handler);
+  };
 
-  body.addEventListener('contextmenu', () => {
-    resolve();
-  });
+  body.addEventListener('click', handler);
+  body.addEventListener('contextmenu', handler);
 });
 
 promise2.then(() => {
@@ -49,21 +50,15 @@ promise2.then(() => {
   body.append(div);
 });
 
-const promises = new Promise((resolve, reject) => {
-  body.addEventListener('contextmenu', () => {
-    resolve();
-  });
+const promises = new Promise((resolve) => {
+  body.addEventListener('contextmenu', () => resolve(), { once: true });
 });
 
-const promises1 = new Promise((resolve, reject) => {
-  body.addEventListener('click', () => {
-    resolve();
-  });
+const promises1 = new Promise((resolve) => {
+  body.addEventListener('click', () => resolve(), { once: true });
 });
 
-const promise3 = Promise.all([promises1, promises]);
-
-promise3.then(() => {
+Promise.all([promises, promises1]).then(() => {
   const div = document.createElement('div');
 
   div.setAttribute('data-qa', 'notification');
